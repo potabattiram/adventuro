@@ -41,33 +41,8 @@ Router.post("/commerce/steps/1/search", async (req, res) => {
   }
 });
 
-Router.post("/commerce/steps/2/search/:id", async (req, res) => {
-  const from = req.body.from;
-  const to = req.body.to;
-  const pickupLocation = req.body.pickupLocation;
-  const fromDate = req.body.fromDate;
-  const toDate = req.body.toDate;
-  const budget = req.body.budget;
-  const currency = req.body.currency;
-  const pax = req.body.pax;
-
+Router.get("/commerce/steps/2/search/:id", async (req, res) => {
   const id = req.params.id;
-
-  // Check for required properties in the request body
-  if (
-    !from ||
-    !to ||
-    !pickupLocation ||
-    !fromDate ||
-    !toDate ||
-    !budget ||
-    !currency ||
-    !pax
-  ) {
-    return res
-      .status(400)
-      .send("Missing required parameters in the request body!");
-  }
 
   const result = await Connection.client
     .db("Adventuro")
