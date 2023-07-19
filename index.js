@@ -9,7 +9,8 @@ app.use(cors({
 }))
 const SearchHandlers = require('./Controllers/AdventuroApp/SearchHandlers');
 const OrdersHandlers = require('./Controllers/AdventuroApp/OrdersHandlers');
-const VendorConfigurator = require('./Controllers/ChannelConfigurator/VendorConfig');
+// const VendorConfigurator = require('./Controllers/ChannelConfigurator/VendorConfig');
+const ChannelConfigs = require('./Controllers/ChannelConfigurator/NewChannelConfigApis');
 
 
 app.get('/', (req, res) => {
@@ -18,7 +19,9 @@ app.get('/', (req, res) => {
 
 app.use(SearchHandlers);
 app.use(OrdersHandlers);
-app.use(VendorConfigurator);
+// app.use(VendorConfigurator);
+app.use(ChannelConfigs);
+
 
 const port = 9000;
 app.listen(port || process.env.PORT, () => {
