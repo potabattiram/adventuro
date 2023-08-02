@@ -127,11 +127,11 @@ Router.put("/app-edit", async (req, res) => {
   }
 });
 
-async function deleteAppData(name) {
+async function deleteAppData(name, collectionName) {
   try {
     const result = await Connection.client
       .db("Adventuro-Channel-config")
-      .collection("app-data")
+      .collection(collectionName)
       .deleteOne({ name }); // Delete the document with the given name
     return result;
   } catch (err) {
@@ -144,7 +144,18 @@ async function deleteAppData(name) {
 Router.delete("/app-delete/:name", async (req, res) => {
   try {
     const name = req.params.name;
-    const result = await deleteAppData(name);
+    const result = await deleteAppData(name,"app-data");
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error deleting app data:", err);
+    res.status(500).send("Error deleting app data");
+  }
+});
+
+Router.delete("/channel-delete/:name", async (req, res) => {
+  try {
+    const name = req.params.name;
+    const result = await deleteAppData(name,"channels");
     res.status(200).json(result);
   } catch (err) {
     console.error("Error deleting app data:", err);
