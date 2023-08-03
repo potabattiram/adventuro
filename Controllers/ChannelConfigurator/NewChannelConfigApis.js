@@ -129,10 +129,14 @@ Router.put("/app-edit", async (req, res) => {
 
 async function deleteAppData(name, collectionName) {
   try {
+    name = name.trim();
+
+    const lowercaseName = name.toLowerCase();
+
     const result = await Connection.client
       .db("Adventuro-Channel-config")
       .collection(collectionName)
-      .deleteOne({ name }); // Delete the document with the given name
+      .deleteOne({ name: { $regex: `^${lowercaseName}$`, $options: 'i' } }); // Delete the document with the given name (case-insensitive)
     return result;
   } catch (err) {
     console.error("Error deleting app data:", err);
