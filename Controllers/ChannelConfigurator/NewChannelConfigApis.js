@@ -156,6 +156,39 @@ Router.delete("/app-delete/:name", async (req, res) => {
   }
 });
 
+
+async function updateChannelData(name, desc) {
+  try {
+    const result = await Connection.client
+      .db("Adventuro-Channel-config")
+      .collection("channels")
+      .updateOne(
+        { name }, // Find the document with the given name
+        {
+          $set: { // Update the specified fields
+            desc
+          },
+        }
+      );
+    return result;
+  } catch (err) {
+    console.error("Error updating app data:", err);
+    throw err;
+  }
+}
+
+Router.put("/channel-edit", async (req, res) => {
+  try {
+    const { name, desc } = req.body;
+    const result = await updateChannelData(name, desc);
+    res.status(202).json(result);
+  } catch (err) {
+    console.error("Error updating app data:", err);
+    res.status(500).send("Error updating app data");
+  }
+});
+
+
 Router.delete("/channel-delete/:name", async (req, res) => {
   try {
     const name = req.params.name;
