@@ -1,6 +1,7 @@
 const express = require("express");
 const Router = express.Router();
 const Connection = require("../../DBConnections/Mongo");
+const ObjectId = require('mongodb').ObjectId;
 
 Router.get("/channels-list", async (req, res) => {
   try {
@@ -94,15 +95,16 @@ Router.post("/app-create", async (req, res) => {
   }
 });
 
-async function updateAppData(name, type, createdBy, lastUpdated) {
+async function updateAppDataById(_id, name, type, createdBy, lastUpdated) {
   try {
     const result = await Connection.client
       .db("Adventuro-Channel-config")
       .collection("app-data")
       .updateOne(
-        { name }, // Find the document with the given name
+        { _id: new ObjectId(_id) }, // Convert _id string to ObjectId and find the document
         {
           $set: { // Update the specified fields
+            name,
             type,
             createdBy,
             lastUpdated,
@@ -118,8 +120,8 @@ async function updateAppData(name, type, createdBy, lastUpdated) {
 
 Router.put("/app-edit", async (req, res) => {
   try {
-    const { name, type, createdBy, lastUpdated } = req.body;
-    const result = await updateAppData(name, type, createdBy, lastUpdated);
+    const { _id, name, type, createdBy, lastUpdated } = req.body;
+    const result = await updateAppDataById(_id, name, type, createdBy, lastUpdated);
     res.status(202).json(result);
   } catch (err) {
     console.error("Error updating app data:", err);
@@ -127,16 +129,12 @@ Router.put("/app-edit", async (req, res) => {
   }
 });
 
-async function deleteAppData(name, collectionName) {
+async function deleteAppData(_id, collectionName) {
   try {
-    name = name.trim();
-
-    const lowercaseName = name.toLowerCase();
-
     const result = await Connection.client
       .db("Adventuro-Channel-config")
       .collection(collectionName)
-      .deleteOne({ name: { $regex: `^${lowercaseName}$`, $options: 'i' } }); // Delete the document with the given name (case-insensitive)
+      .deleteOne({ _id: new ObjectId(_id) } ); 
     return result;
   } catch (err) {
     console.error("Error deleting app data:", err);
@@ -144,11 +142,10 @@ async function deleteAppData(name, collectionName) {
   }
 }
 
-// Use the router to handle incoming requests
-Router.delete("/app-delete/:name", async (req, res) => {
+Router.delete("/app-delete/:_id", async (req, res) => {
   try {
-    const name = req.params.name;
-    const result = await deleteAppData(name,"app-data");
+    const _id = req.params._id;
+    const result = await deleteAppData(_id,"app-data");
     res.status(200).json(result);
   } catch (err) {
     console.error("Error deleting app data:", err);
@@ -157,15 +154,16 @@ Router.delete("/app-delete/:name", async (req, res) => {
 });
 
 
-async function updateChannelData(name, desc) {
+async function updateChannelData(_id, name, desc) {
   try {
     const result = await Connection.client
       .db("Adventuro-Channel-config")
       .collection("channels")
       .updateOne(
-        { name }, // Find the document with the given name
+        { _id: new ObjectId(_id) }, // Find the document with the given name
         {
           $set: { // Update the specified fields
+            name,
             desc
           },
         }
@@ -179,8 +177,8 @@ async function updateChannelData(name, desc) {
 
 Router.put("/channel-edit", async (req, res) => {
   try {
-    const { name, desc } = req.body;
-    const result = await updateChannelData(name, desc);
+    const { _id, name, desc } = req.body;
+    const result = await updateChannelData(_id, name, desc);
     res.status(202).json(result);
   } catch (err) {
     console.error("Error updating app data:", err);
@@ -189,10 +187,10 @@ Router.put("/channel-edit", async (req, res) => {
 });
 
 
-Router.delete("/channel-delete/:name", async (req, res) => {
+Router.delete("/channel-delete/:_id", async (req, res) => {
   try {
-    const name = req.params.name;
-    const result = await deleteAppData(name,"channels");
+    const _id = req.params._id;
+    const result = await deleteAppData(_id,"channels");
     res.status(200).json(result);
   } catch (err) {
     console.error("Error deleting app data:", err);
